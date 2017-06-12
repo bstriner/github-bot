@@ -16,6 +16,9 @@ schedule:
 # label to add to issues when closing automatically (optional)
 # label: inactive
 
+# label to filter which issues to process (optional)
+# filterlabel: bug
+
 # issue warnings instead of closing until this date (optional)
 # first_closing_date: 2017-03-01 12:00:00
 

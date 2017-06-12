@@ -11,7 +11,11 @@ def process_issues(config):
     conn = connect(config)
     rate_limit(config)
     repo = conn.get_repo(config["repo"])
-    issues = repo.get_issues(state="open")
+    if "filterlabel" not in config:
+        issues = repo.get_issues(state="open")
+    else:
+        logging.info("Label filter specified. Only processing issues with label \"{}\"".format(config["filterlabel"]))
+        issues = repo.get_issues(state="open", labels=[repo.get_label(config["filterlabel"])])
     schedule = config["schedule"]
     warning_start = schedule["warning_start"]
     warning_frequency = schedule["warning_frequency"]
@@ -68,6 +72,7 @@ def main(argv=None):
     parser.add_argument('--token', action="store", help='Github token')
     parser.add_argument('--repo', action="store", help='Repository')
     parser.add_argument('--label', action="store", help='Add this label to issues when closing')
+    parser.add_argument('--filter-label', action="store", help='Only process issues that have this label')
     parser.add_argument('--test', action="store_true",
                         help='Print actions that would be taken but do not modify repository')
     args = parser.parse_args(argv)
@@ -84,6 +89,8 @@ def main(argv=None):
         config["test"] = True
     if args.label:
         config["label"] = args.label
+    if args.filter_label:
+        config["filterlabel"] = args.filter_label
     if "label" not in config:
         config["label"] = None
     start_logging(config)
